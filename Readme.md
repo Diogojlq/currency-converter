@@ -3,8 +3,6 @@
 # Currency Converter
 ## **A CLI program that converts currencies**
 
-[![Status Badge](https://github.com/Rayrsn/currencyConverter/actions/workflows/go.yml/badge.svg)](https://github.com/Rayrsn/currencyConverter/actions/workflows/go.yml)
-
 </div>
 
 ## Features
