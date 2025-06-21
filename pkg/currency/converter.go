@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type CurrencyResponse struct {
@@ -15,6 +16,9 @@ type CurrencyResponse struct {
 func NewConverter() *Converter {
     return &Converter{
         BaseURL: "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/",
+        Client: &http.Client{
+		Timeout: 5 * time.Second,
+		},
     }
 }
 
