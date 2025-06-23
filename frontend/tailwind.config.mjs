@@ -11,7 +11,7 @@ const config = {
   },
   plugins: [daisyui],
   daisyui: {
-    themes: ["light", "dark"], // Você pode personalizar aqui depois
+    themes: ["light", "dark"],
   },
 };
 
