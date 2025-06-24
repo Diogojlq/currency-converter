@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
@@ -13,48 +15,60 @@ import (
 var Version = "1.1.0"
 
 func main() {
-    if err := run(); err != nil {
-        fmt.Fprintf(os.Stderr, "error: %v\n", err)
-        os.Exit(1)
-    }
+	// If running as CLI (not 'serve'), use CLI mode
+	if len(os.Args) > 1 && os.Args[1] != "serve" {
+		if err := run(); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
+	// HTTP server mode
+	http.HandleFunc("/api/currencies", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(utils.CurrencyCodes())
+	})
+
+	fmt.Println("Server running at http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }
 
 func run() error {
-    if len(os.Args) == 1 {
-        return fmt.Errorf("no arguments passed")
-    }
+	if len(os.Args) == 1 {
+		return fmt.Errorf("no arguments passed")
+	}
 
-    if len(os.Args) == 2 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
-        fmt.Println("Version:", Version)
-        return nil
-    }
+	if len(os.Args) == 2 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
+		fmt.Println("Version:", Version)
+		return nil
+	}
 
-    converter := currency.NewConverter()
+	converter := currency.NewConverter()
 
-    
 	firstCurrency := os.Args[1]
 	secondCurrency := os.Args[2]
 
-    switch {
-    case len(os.Args) == 3 && utils.IsCurrency(strings.ToUpper(firstCurrency)) && utils.IsCurrency(strings.ToUpper(secondCurrency)):
-        rate, err := converter.Convert(1.0, firstCurrency, secondCurrency)
-        if err != nil {
-            return err
-        }
-        fmt.Printf("1 %s = %f %s\n", strings.ToUpper(firstCurrency), rate, strings.ToUpper(secondCurrency))
-        
-    case len(os.Args) == 4 && utils.IsNumber(firstCurrency):
-		thirdCurrency := os.Args[3]
-        amount, _ := strconv.ParseFloat(firstCurrency, 64)
-        rate, err := converter.Convert(amount, secondCurrency, thirdCurrency)
-        if err != nil {
-            return err
-        }
-        fmt.Printf("%g %s = %f %s\n", amount, secondCurrency, rate, strings.ToUpper(thirdCurrency))
-        
-    default:
-        return fmt.Errorf("invalid arguments")
-    }
+	switch {
+	case len(os.Args) == 3 && utils.IsCurrency(strings.ToUpper(firstCurrency)) && utils.IsCurrency(strings.ToUpper(secondCurrency)):
+		rate, err := converter.Convert(1.0, firstCurrency, secondCurrency)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("1 %s = %f %s\n", strings.ToUpper(firstCurrency), rate, strings.ToUpper(secondCurrency))
 
-    return nil
+	case len(os.Args) == 4 && utils.IsNumber(firstCurrency):
+		thirdCurrency := os.Args[3]
+		amount, _ := strconv.ParseFloat(firstCurrency, 64)
+		rate, err := converter.Convert(amount, secondCurrency, thirdCurrency)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("%g %s = %f %s\n", amount, secondCurrency, rate, strings.ToUpper(thirdCurrency))
+
+	default:
+		return fmt.Errorf("invalid arguments")
+	}
+
+	return nil
 }
