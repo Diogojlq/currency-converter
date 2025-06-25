@@ -14,7 +14,7 @@ export default function Home() {
       try {
         const res = await fetch("http://localhost:8080/api/currencies");
         const data = await res.json();
-        setCurrencies(data); // espera-se que o backend retorne um array de strings
+        setCurrencies(data);
       } catch (err) {
         console.error("Erro ao buscar moedas:", err);
       }
@@ -45,7 +45,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold mb-6 text-center text-primary">Currency Converter</h1>
         <div className="mb-4">
           <select
-            className="w-full p-2 mb-2 input input-bordered"
+            className="w-full p-2 mb-2 input input-bordered bg-white text-black"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
           >
@@ -56,7 +56,7 @@ export default function Home() {
           </select>
 
           <select
-            className="w-full p-2 mb-2 input input-bordered"
+            className="w-full p-2 mb-2 input input-bordered bg-white text-black"
             value={to}
             onChange={(e) => setTo(e.target.value)}
           >
@@ -67,7 +67,7 @@ export default function Home() {
           </select>
 
           <input
-            className="w-full p-2 border rounded input input-bordered"
+            className="w-full p-2 border rounded input input-bordered bg-white text-black"
             placeholder="Amount"
             type="number"
             value={amount}
@@ -75,7 +75,7 @@ export default function Home() {
           />
         </div>
         <button
-          className="w-full btn btn-primary"
+          className="w-full btn btn-primary border rounded"
           onClick={handleConvert}
         >
           Convert
