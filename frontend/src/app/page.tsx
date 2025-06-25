@@ -8,7 +8,6 @@ export default function Home() {
   const [result, setResult] = useState<string | null>(null);
   const [currencies, setCurrencies] = useState<string[]>([]);
 
-  // Buscar moedas do backend
   useEffect(() => {
     const fetchCurrencies = async () => {
       try {
@@ -29,14 +28,25 @@ export default function Home() {
       return;
     }
 
-    const res = await fetch("http://localhost:8080/api/currencies", {
+    const res = await fetch("http://localhost:8080/api/convert", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to, amount }),
+      body: JSON.stringify({ from, to, amount: Number(amount) }),
     });
 
     const data = await res.json();
-    setResult(data.result);
+    if (!res.ok) {
+      alert(data.error || "Erro na conversão");
+      return;
+    }
+
+    if (typeof data.result === "number") {
+      // Always show two digits after the decimal point
+      const str = data.result.toFixed(2);
+      setResult(str);
+    } else {
+      setResult("");
+    }
   };
 
   return (
